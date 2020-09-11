@@ -7,7 +7,7 @@ Created on Tue Sep  8 13:03:37 2020
 import tensorflow as tf 
 import numpy as np
 import model_tools as mt
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 # output_activation = tf.keras.activations.linear
 output_activation = tf.keras.activations.tanh
