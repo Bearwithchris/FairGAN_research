@@ -3,7 +3,7 @@
 #PBS -N job_GAN
 #PBS -j oe
 #PBS -o output.log
-#PBS -q research
+#PBS -q project
 #PBS -v CONTAINER_IMAGE=nvcr.io/nvidia/tensorflow:20.02-tf2-py3
 
 date
