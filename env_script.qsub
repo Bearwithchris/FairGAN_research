@@ -1,0 +1,11 @@
+#!/bin/bash
+#PBS -l select=1:ncpus=5:ngpus=1
+#PBS -N job test
+#PBS -j oe
+#PBS -o output.log
+#PBS -q research
+#PBS -v CONTAINER_IMAGE=nvcr.io/ nvidia /tensorflow:20.02 tf1 py3
+
+date
+cd /home/users/christopher_teo/FairGAN_research/proGAN
+python train.py
