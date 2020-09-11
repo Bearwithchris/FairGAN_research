@@ -4,7 +4,7 @@
 #PBS -j oe
 #PBS -o output.log
 #PBS -q research
-#PBS -v CONTAINER_IMAGE=nvcr.io/ nvidia /tensorflow_20.02-tf2-py3
+#PBS -v CONTAINER_IMAGE=nvcr.io/ nvidia /tensorflow:20.02-tf2-py3
 
 date
 cd /home/users/christopher_teo/FairGAN_research/proGAN
