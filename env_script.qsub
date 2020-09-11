@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -l select=1:ncpus=5:ngpus=1
-#PBS -N job test
+#PBS -N job_GAN
 #PBS -j oe
 #PBS -o output.log
 #PBS -q research
