@@ -7,7 +7,7 @@ Created on Tue Sep  8 15:11:15 2020
 import tensorflow as tf 
 import numpy as np
 import model_tools as mt
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import model as m
 from tensorflow.keras import backend as K
 import os
@@ -110,17 +110,17 @@ def calculate_batch_size(image_size):
     
     
     
-def generate_and_save_images(model, epoch, test_input, figure_size=(12,6), subplot=(3,6), save=True, is_flatten=False):
-    # Test input is a list include noise and label
-    predictions = model.predict(test_input)
-    fig = plt.figure(figsize=figure_size)
-    for i in range(predictions.shape[0]):
-        axs = plt.subplot(subplot[0], subplot[1], i+1)
-        plt.imshow(predictions[i] * 0.5 + 0.5)
-        plt.axis('off')
-    if save:
-        plt.savefig(os.path.join(OUTPUT_PATH, '{}x{}_image_at_epoch_{:04d}.png'.format(predictions.shape[1], predictions.shape[2], epoch)))
-    plt.show()
+# def generate_and_save_images(model, epoch, test_input, figure_size=(12,6), subplot=(3,6), save=True, is_flatten=False):
+#     # Test input is a list include noise and label
+#     predictions = model.predict(test_input)
+#     fig = plt.figure(figsize=figure_size)
+#     for i in range(predictions.shape[0]):
+#         axs = plt.subplot(subplot[0], subplot[1], i+1)
+#         plt.imshow(predictions[i] * 0.5 + 0.5)
+#         plt.axis('off')
+#     if save:
+#         plt.savefig(os.path.join(OUTPUT_PATH, '{}x{}_image_at_epoch_{:04d}.png'.format(predictions.shape[1], predictions.shape[2], epoch)))
+#     plt.show()
 
 num_examples_to_generate = 9
 
@@ -266,7 +266,7 @@ for epoch in range(CURRENT_EPOCH, EPOCHs + 1):
     # clear_output(wait=True)
     
     # Using a consistent image (sample_X) so that the progress of the model is clearly visible.
-    generate_and_save_images(generator, epoch, [sample_noise, sample_alpha], figure_size=(6,6), subplot=(3,3), save=True, is_flatten=False)
+    # generate_and_save_images(generator, epoch, [sample_noise, sample_alpha], figure_size=(6,6), subplot=(3,3), save=True, is_flatten=False)
     
     #Override old model and save over it
     if epoch % SAVE_EVERY_N_EPOCH == 0:
