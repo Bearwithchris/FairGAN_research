@@ -29,7 +29,7 @@ batch_size = 32
 CURRENT_EPOCH = 1 # Epoch start from 1. If resume training, set this to the previous model saving epoch.
 
 #Directories
-DATA_BASE_DIR="../../alt"
+DATA_BASE_DIR="../../scratch/alt"
 #DATA_BASE_DIR="D:/GIT/ResearchCode/proGAN/alt"
 TRAIN_LOGDIR = os.path.join("logs", "tensorflow", 'train_data') # Sets up a log directory.
 MODEL_PATH = 'models'
