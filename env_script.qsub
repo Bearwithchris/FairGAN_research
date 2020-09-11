@@ -2,7 +2,7 @@
 #PBS -l select=1:ncpus=5:ngpus=1
 #PBS -N job_GAN
 #PBS -j oe
-#PBS -o ./output.log
+#PBS -o output.log
 #PBS -q research
 #PBS -v CONTAINER_IMAGE=nvcr.io/nvidia/tensorflow:20.02-tf2-py3
 
