@@ -25,8 +25,8 @@ c.config_gpu()
 
 
 
-batch_size = 32
-CURRENT_EPOCH = 1 # Epoch start from 1. If resume training, set this to the previous model saving epoch.
+batch_size = 16
+CURRENT_EPOCH = 120 # Epoch start from 1. If resume training, set this to the previous model saving epoch.
 
 #Directories
 DATA_BASE_DIR="../../scratch/alt"
@@ -103,7 +103,7 @@ def calculate_batch_size(image_size):
     #     return 3
     if image_size <= 16:
         return 16
-    elif image_size <= 32:
+    elif image_size <= 64:
         return 8
     else:
         return 4
