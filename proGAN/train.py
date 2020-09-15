@@ -27,6 +27,7 @@ c.config_gpu()
 
 batch_size = 16
 CURRENT_EPOCH = 120 # Epoch start from 1. If resume training, set this to the previous model saving epoch.
+image_size = 16
 
 #Directories
 DATA_BASE_DIR="../../scratch/alt"
@@ -47,7 +48,6 @@ file_writer = tf.summary.create_file_writer(TRAIN_LOGDIR)
 output_activation = tf.keras.activations.tanh
 kernel_initializer = 'he_normal'
 NOISE_DIM = 512
-image_size = 32
 LR = 1e-3
 BETA_1 = 0.
 BETA_2 = 0.99
@@ -199,21 +199,21 @@ def WGAN_GP_train_g_step(generator, discriminator, alpha, batch_size, step):
 
 #Load old Models trained
 # Load previous resolution model
-if image_size > 4:
-    if os.path.isfile(os.path.join(MODEL_PATH, '{}x{}_generator.h5'.format(int(image_size / 2), int(image_size / 2)))):
-        generator.load_weights(os.path.join(MODEL_PATH, '{}x{}_generator.h5'.format(int(image_size / 2), int(image_size / 2))), by_name=True)
-        print("generator loaded")
-    if os.path.isfile(os.path.join(MODEL_PATH, '{}x{}_discriminator.h5'.format(int(image_size / 2), int(image_size / 2)))):
-        discriminator.load_weights(os.path.join(MODEL_PATH, '{}x{}_discriminator.h5'.format(int(image_size / 2), int(image_size / 2))), by_name=True)
-        print("discriminator loaded")
+# if image_size > 4:
+#     if os.path.isfile(os.path.join(MODEL_PATH, '{}x{}_generator.h5'.format(int(image_size / 2), int(image_size / 2)))):
+#         generator.load_weights(os.path.join(MODEL_PATH, '{}x{}_generator.h5'.format(int(image_size / 2), int(image_size / 2))), by_name=True)
+#         print("generator loaded")
+#     if os.path.isfile(os.path.join(MODEL_PATH, '{}x{}_discriminator.h5'.format(int(image_size / 2), int(image_size / 2)))):
+#         discriminator.load_weights(os.path.join(MODEL_PATH, '{}x{}_discriminator.h5'.format(int(image_size / 2), int(image_size / 2))), by_name=True)
+#         print("discriminator loaded")
         
 # # To resume training, comment it if not using.
-# if os.path.isfile(os.path.join(MODEL_PATH, '{}x{}_generator.h5'.format(int(image_size), int(image_size)))):
-#     generator.load_weights(os.path.join(MODEL_PATH, '{}x{}_generator.h5'.format(int(image_size), int(image_size))), by_name=False)
-#     print("generator loaded")
-# if os.path.isfile(os.path.join(MODEL_PATH, '{}x{}_discriminator.h5'.format(int(image_size), int(image_size)))):
-#     discriminator.load_weights(os.path.join(MODEL_PATH, '{}x{}_discriminator.h5'.format(int(image_size), int(image_size))), by_name=False)
-#     print("discriminator loaded")
+if os.path.isfile(os.path.join(MODEL_PATH, '{}x{}_generator.h5'.format(int(image_size), int(image_size)))):
+    generator.load_weights(os.path.join(MODEL_PATH, '{}x{}_generator.h5'.format(int(image_size), int(image_size))), by_name=False)
+    print("generator loaded")
+if os.path.isfile(os.path.join(MODEL_PATH, '{}x{}_discriminator.h5'.format(int(image_size), int(image_size)))):
+    discriminator.load_weights(os.path.join(MODEL_PATH, '{}x{}_discriminator.h5'.format(int(image_size), int(image_size))), by_name=False)
+    print("discriminator loaded")
 
 
 #===================================Actual Training======================================================================
