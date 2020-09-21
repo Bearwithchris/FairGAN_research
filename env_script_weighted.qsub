@@ -1,0 +1,11 @@
+#!/bin/bash
+#PBS -l select=1:ncpus=5:ngpus=1
+#PBS -N weighted_g
+#PBS -j oe
+#PBS -o output.log
+#PBS -q project
+#PBS -v CONTAINER_IMAGE=nvcr.io/nvidia/tensorflow:20.02-tf2-py3
+
+date
+cd /home/users/christopher_teo/FairGAN_research/Weighted_proGAN
+python train.py

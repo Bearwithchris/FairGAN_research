@@ -12,16 +12,18 @@ import numpy as np
 import datetime as dt
 from resnet import resnet18
 
-checkpoints="./training_checkpoints"
+# checkpoints="./training_checkpoints"
+checkpoints="./training_checkpoints_4"
 # checkpoints="./restnet18_bias_point9_training_checkpoints"
 
-test_dir1 = 'H:/Datasets/celebA_Male_female/669126_1178231_bundle_archive/Dataset/Test/Male'
-test_dir2 = 'H:/Datasets/celebA_Male_female/669126_1178231_bundle_archive/Dataset/Test/female'
+test_dir1 = 'D:/GIT/local_data_in_use/Test/Male'
+test_dir2 = 'D:/GIT/local_data_in_use/Test/Female'
 
 STORE_PATH="./"
 out_file_Test = STORE_PATH + f"/TEST_{dt.datetime.now().strftime('%d%m%Y%H%M')}"
 train_summary_writer_Test = tf.summary.create_file_writer(out_file_Test)
 
+dim=4
 def create_model():  
     # base_model=tf.keras.applications.InceptionV3(
     #     include_top=False,
@@ -40,7 +42,7 @@ def create_model():
     # model.add(tf.keras.layers.Flatten())
     # model.add(tf.keras.layers.Dense(2))
     # model.add(tf.keras.layers.Softmax())
-    model=resnet18.make_resnet_18().call(isTrain=False)
+    model=resnet18.make_resnet_18(dim).call(isTrain=False)
     model.trainable=False
     
     optimizer=tf.keras.optimizers.Adam(1e-4)
@@ -77,7 +79,7 @@ def sort(listDir):
         placeHolder[numerics[i]-1]=listDir[i]
     return placeHolder
 
-images_labels_concat_shuffled,images_concat_shuffled=data.datasets(test_dir1,test_dir2,13000,bias=0.6)
+images_labels_concat_shuffled,images_concat_shuffled=data.datasets(dim,test_dir1,test_dir2,1300,bias=0.9)
 
 EPOCH=15
 BATCH_SIZE=64

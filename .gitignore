@@ -16,3 +16,4 @@ Weighted_proGAN/Density_checkpoint/training_checkpoints_32/checkpoint
 Weighted_proGAN/Density_checkpoint/training_checkpoints_64/checkpoint
 Weighted_proGAN/Density_checkpoint/training_checkpoints_4/checkpoint
 Weighted_proGAN/Density_checkpoint/training_checkpoints_8/checkpoint
+*.zip

@@ -50,6 +50,7 @@ file_writer = tf.summary.create_file_writer(TRAIN_LOGDIR)
 output_activation = tf.keras.activations.tanh
 kernel_initializer = 'he_normal'
 NOISE_DIM = 512
+
 LR = 1e-3
 BETA_1 = 0.
 BETA_2 = 0.99
