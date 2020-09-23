@@ -50,6 +50,7 @@ file_writer = tf.summary.create_file_writer(TRAIN_LOGDIR)
 output_activation = tf.keras.activations.tanh
 kernel_initializer = 'he_normal'
 NOISE_DIM = 512
+
 LR = 1e-3
 BETA_1 = 0.
 BETA_2 = 0.99
@@ -61,11 +62,6 @@ DECAY_FACTOR=1.00004
 
 
 
-#Initiliase Data
-# list_ds = tf.data.Dataset.list_files(DATA_BASE_DIR + '/*')                    #Returns a tensor Dataset of file directory
-# preprocess_function = partial(data.preprocess_image, target_size=image_size)  #Partially fill in a function data.preprocess_image with the arguement image_size
-# train_data = list_ds.map(preprocess_function).shuffle(100).batch(batch_size)  #Apply the function pre_process to list_ds
-
 
 #Initilaise Model
 generator, discriminator = m.model_builder(image_size)
@@ -75,10 +71,6 @@ tf.keras.utils.plot_model(generator, show_shapes=True, dpi=64)
 discriminator.summary()
 tf.keras.utils.plot_model(discriminator, show_shapes=True, dpi=64)
 
-
-# #Define Optimiser
-# D_optimizer = tf.keras.optimizers.Adam(learning_rate=LR, beta_1=BETA_1, beta_2=BETA_2, epsilon=EPSILON)
-# G_optimizer = tf.keras.optimizers.Adam(learning_rate=LR, beta_1=BETA_1, beta_2=BETA_2, epsilon=EPSILON)
 
 
     
@@ -97,27 +89,11 @@ def generate_and_save_images(model, epoch, test_input, figure_size=(12,6), subpl
 
 num_examples_to_generate = 9
 
-# We will reuse this seed overtime (so it's easier)
-# to visualize progress in the animated GIF)
-# sample_noise = tf.random.normal([num_examples_to_generate, NOISE_DIM], seed=0)
-# sample_alpha = np.repeat(1, num_examples_to_generate).reshape(num_examples_to_generate, 1).astype(np.float32)
-# generate_and_save_images(generator, 0, [sample_noise, sample_alpha], figure_size=(6,6), subplot=(3,3), save=False, is_flatten=False)
-
-
 LAMBDA = 10
 
 
 
-#Load old Models trained
-# Load previous resolution model
-# if image_size > 4:
-#     if os.path.isfile(os.path.join(MODEL_PATH, '{}x{}_generator.h5'.format(int(image_size / 2), int(image_size / 2)))):
-#         generator.load_weights(os.path.join(MODEL_PATH, '{}x{}_generator.h5'.format(int(image_size / 2), int(image_size / 2))), by_name=True)
-#         print("generator loaded")
-#     if os.path.isfile(os.path.join(MODEL_PATH, '{}x{}_discriminator.h5'.format(int(image_size / 2), int(image_size / 2)))):
-#         discriminator.load_weights(os.path.join(MODEL_PATH, '{}x{}_discriminator.h5'.format(int(image_size / 2), int(image_size / 2))), by_name=True)
-#         print("discriminator loaded")
-        
+
 # To resume training, comment it if not using.
 if os.path.isfile(os.path.join(MODEL_PATH, '{}x{}_generator.h5'.format(int(image_size), int(image_size)))):
     generator.load_weights(os.path.join(MODEL_PATH, '{}x{}_generator.h5'.format(int(image_size), int(image_size))), by_name=False)
@@ -128,23 +104,12 @@ if os.path.isfile(os.path.join(MODEL_PATH, '{}x{}_discriminator.h5'.format(int(i
 
 
 #===================================Actual Training======================================================================
-# total_data_number = len(os.listdir(DATA_BASE_DIR))
-# switch_res_every_n_epoch = 40
 
 
-# current_learning_rate = LR
-# training_steps = math.ceil(total_data_number / batch_size)
-# # Fade in half of switch_res_every_n_epoch epoch, and stablize another half
-# alpha_increment = 1. / (switch_res_every_n_epoch / 2 * training_steps)
-# alpha = min(1., (CURRENT_EPOCH - 1) % switch_res_every_n_epoch * training_steps *  alpha_increment)
-EPOCHs = 320
-SAVE_EVERY_N_EPOCH = 5 # Save checkpoint at every n epoch
-
-
-samples=10
+samples=100
 
 for i in range(samples):
-    sample_noise = tf.random.normal([num_examples_to_generate, NOISE_DIM], seed=0)
+    sample_noise = tf.random.normal([num_examples_to_generate, NOISE_DIM])
     sample_alpha = np.repeat(1, num_examples_to_generate).reshape(num_examples_to_generate, 1).astype(np.float32)    
 # Using a consistent image (sample_X) so that the progress of the model is clearly visible.
     generate_and_save_images(generator, CURRENT_EPOCH, [sample_noise, sample_alpha], figure_size=(6,6), subplot=(3,3), save=True, is_flatten=False)

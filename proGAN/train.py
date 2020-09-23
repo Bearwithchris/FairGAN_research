@@ -25,22 +25,44 @@ c.config_gpu()
 
 
 
-batch_size = 16
-CURRENT_EPOCH = 120 # Epoch start from 1. If resume training, set this to the previous model saving epoch.
-image_size = 16
+batch_size = 32
+CURRENT_EPOCH = 1 # Epoch start from 1. If resume training, set this to the previous model saving epoch.
+image_size = 4
 
 #Directories
 # DATA_BASE_DIR="../../scratch/alt"
-DATA_BASE_DIR="D:/GIT/local_data_in_use/alt"
+DATA_BASE_DIR="D:/GIT/local_data_in_use/bias_point9"
 TRAIN_LOGDIR = os.path.join("logs", "tensorflow", 'train_data') # Sets up a log directory.
 MODEL_PATH = 'models'
 OUTPUT_PATH = 'outputs'
+PROGRESS='progress'
+
+
+
 
 if not os.path.exists(OUTPUT_PATH):
     os.makedirs(OUTPUT_PATH)
 if not os.path.exists(MODEL_PATH):
     os.makedirs(MODEL_PATH)
+if not os.path.exists(PROGRESS):
+    os.makedirs(PROGRESS)
 
+#Progress log sections============================================================
+#Create Progress Directory
+def log_progress_active():
+    if not os.path.isfile("./"+PROGRESS+"/progressLog.txt"):
+        f = open("./"+PROGRESS+"/progressLog.txt", "w")
+    else:
+        f = open("./"+PROGRESS+"/progressLog.txt", "a")
+    return f
+        
+def log_progress_deactive(f):
+    f.close()
+ 
+f=log_progress_active()
+f.write("image_size= "+str(image_size)+" batch_size= "+str(batch_size)+" Current epoch= "+str(CURRENT_EPOCH)+"\n")
+log_progress_deactive(f)
+#=================================================================================
 # Creates a file writer for the log directory.
 file_writer = tf.summary.create_file_writer(TRAIN_LOGDIR)
 
@@ -91,24 +113,17 @@ def set_learning_rate(new_lr, D_optimizer, G_optimizer):
     K.set_value(G_optimizer.lr, new_lr)
     
 def calculate_batch_size(image_size):
-    # if image_size < 64:
-    #     return 16
-    # elif image_size < 128:
-    #     return 12
-    # elif image_size == 128:
-    #     return 8
-    # elif image_size == 256:
-    #     return 4
-    # else:
-    #     return 3
-    if image_size <= 16:
+    if image_size < 64:
+        return 64
+    elif image_size < 128:
+        return 32
+    elif image_size == 128:
+        return 32
+    elif image_size == 256:
         return 16
-    elif image_size <= 64:
-        return 8
     else:
-        return 4
-    
-    
+        return 8
+
     
 # def generate_and_save_images(model, epoch, test_input, figure_size=(12,6), subplot=(3,6), save=True, is_flatten=False):
 #     # Test input is a list include noise and label
@@ -245,6 +260,12 @@ for epoch in range(CURRENT_EPOCH, EPOCHs + 1):
     print('Start of epoch %d' % (epoch,))
     print('Current alpha: %f' % (alpha,))
     print('Current resolution: {} * {}'.format(image_size, image_size))
+    
+    
+    f=log_progress_active()
+    f.write("Start of epoch: %d     Current alpha: %f   Current resolution: %d x %d " % (epoch,alpha,image_size,image_size))
+    f=log_progress_deactive(f)
+    
     # Using learning rate decay
 #     current_learning_rate = learning_rate_decay(current_learning_rate)
 #     print('current_learning_rate %f' % (current_learning_rate,))
@@ -281,7 +302,9 @@ for epoch in range(CURRENT_EPOCH, EPOCHs + 1):
         print ('Saving model for epoch {}'.format(epoch))
     
     print ('Time taken for epoch {} is {} sec\n'.format(epoch,time.time()-start))
-    
+    f=log_progress_active()
+    f.write("Time taken: %f \n" %(time.time()-start))
+    log_progress_deactive(f)
     
     # Train next resolution
     if epoch % switch_res_every_n_epoch == 0:

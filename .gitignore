@@ -17,3 +17,6 @@ Weighted_proGAN/Density_checkpoint/training_checkpoints_64/checkpoint
 Weighted_proGAN/Density_checkpoint/training_checkpoints_4/checkpoint
 Weighted_proGAN/Density_checkpoint/training_checkpoints_8/checkpoint
 *.zip
+*.data-00000-of-00002
+loss_measurement/training_checkpoints/ckpt-1.data-00001-of-00002
+*.data-00001-of-00002
