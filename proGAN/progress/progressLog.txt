@@ -1,0 +1,4 @@
+image_size= 4 batch_size= 16 Current epoch= 1
+Start of epoch: 1     Current alpha: 0.000000   Current resolution: 4 x 4 image_size= 4 batch_size= 16 Current epoch= 1
+Start of epoch: 1     Current alpha: 0.000000   Current resolution: 4 x 4 image_size= 4 batch_size= 16 Current epoch= 1
+Start of epoch: 1     Current alpha: 0.000000   Current resolution: 4 x 4 

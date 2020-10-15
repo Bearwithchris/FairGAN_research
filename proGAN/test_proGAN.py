@@ -27,14 +27,14 @@ c.config_gpu()
 
 batch_size = 16
 CURRENT_EPOCH = 1 # Epoch start from 1. If resume training, set this to the previous model saving epoch.
-image_size = 128
+image_size = 256
 
 #Directories
 # DATA_BASE_DIR="../../scratch/alt"
 #DATA_BASE_DIR="D:/GIT/ResearchCode/proGAN/alt"
 TRAIN_LOGDIR = os.path.join("logs", "tensorflow", 'train_data') # Sets up a log directory.
-MODEL_PATH = 'models'
-OUTPUT_PATH = 'Samples'
+MODEL_PATH = 'models_boost'
+OUTPUT_PATH = 'Samples_boost'
 
 if not os.path.exists(OUTPUT_PATH):
     os.makedirs(OUTPUT_PATH)
@@ -111,10 +111,10 @@ if os.path.isfile(os.path.join(MODEL_PATH, '{}x{}_discriminator.h5'.format(int(i
 
 
 
-samples=100
+samples=10
 
 for i in range(samples):
-    sample_noise = tf.random.normal([num_examples_to_generate, NOISE_DIM], seed=100)
+    sample_noise = tf.random.normal([num_examples_to_generate, NOISE_DIM])
     sample_alpha = np.repeat(1, num_examples_to_generate).reshape(num_examples_to_generate, 1).astype(np.float32)    
 # Using a consistent image (sample_X) so that the progress of the model is clearly visible.
     generate_and_save_images(generator, CURRENT_EPOCH, [sample_noise, sample_alpha], figure_size=(6,6), subplot=(3,3), save=True, is_flatten=False)

@@ -25,7 +25,7 @@ c.config_gpu()
 
 
 
-batch_size = 32
+batch_size = 16
 CURRENT_EPOCH = 1 # Epoch start from 1. If resume training, set this to the previous model saving epoch.
 image_size = 4
 
@@ -70,10 +70,23 @@ file_writer = tf.summary.create_file_writer(TRAIN_LOGDIR)
 output_activation = tf.keras.activations.tanh
 kernel_initializer = 'he_normal'
 NOISE_DIM = 512
-LR = 1e-3
-BETA_1 = 0.
-BETA_2 = 0.99
-EPSILON = 1e-8
+
+def training_param_init(network_type):
+    if network_type=="WAS_less_1024":
+        LR = 1e-4 #Alpha
+        BETA_1 = 0. #beta1
+        BETA_2 = 0.9 #beta2
+        EPSILON = 1e-8 #epsilon'
+        N_CRITICS=5
+    else:
+        LR = 1e-3 #Alpha
+        BETA_1 = 0. #beta1
+        BETA_2 = 0.99 #beta2
+        EPSILON = 1e-8 #epsilon
+        N_CRITICS=1
+    return LR,BETA_1,BETA_2,EPSILON,N_CRITICS
+        
+LR,BETA_1,BETA_2,EPSILON,N_CRITICS=training_param_init("WAS_less_1024")
 
 # Decay learning rate
 MIN_LR = 0.000001
@@ -113,16 +126,16 @@ def set_learning_rate(new_lr, D_optimizer, G_optimizer):
     K.set_value(G_optimizer.lr, new_lr)
     
 def calculate_batch_size(image_size):
-    if image_size < 64:
-        return 64
-    elif image_size < 128:
-        return 32
-    elif image_size == 128:
-        return 32
-    elif image_size == 256:
+    if image_size <= 128:
         return 16
-    else:
+    elif image_size==256:
+        return 12
+    elif image_size == 512:
         return 8
+    elif image_size == 1024:
+        return 4
+    else:
+        return 3
 
     
 # def generate_and_save_images(model, epoch, test_input, figure_size=(12,6), subplot=(3,6), save=True, is_flatten=False):
@@ -246,7 +259,7 @@ training_steps = math.ceil(total_data_number / batch_size)
 alpha_increment = 1. / (switch_res_every_n_epoch / 2 * training_steps)
 alpha = min(1., (CURRENT_EPOCH - 1) % switch_res_every_n_epoch * training_steps *  alpha_increment)
 EPOCHs = 320
-SAVE_EVERY_N_EPOCH = 5 # Save checkpoint at every n epoch
+SAVE_EVERY_N_EPOCH = 1 # Save checkpoint at every n epoch
 
 sample_noise = tf.random.normal([num_examples_to_generate, NOISE_DIM], seed=0)
 sample_alpha = np.repeat(1, num_examples_to_generate).reshape(num_examples_to_generate, 1).astype(np.float32)
@@ -276,8 +289,10 @@ for epoch in range(CURRENT_EPOCH, EPOCHs + 1):
         alpha_tensor = tf.constant(np.repeat(alpha, current_batch_size).reshape(current_batch_size, 1), dtype=tf.float32)
        
         # Train step
-        WGAN_GP_train_d_step(generator, discriminator, image, alpha_tensor,
-                             batch_size=tf.constant(current_batch_size, dtype=tf.int64), step=tf.constant(step, dtype=tf.int64))
+        for critic in range(N_CRITICS):
+            WGAN_GP_train_d_step(generator, discriminator, image, alpha_tensor,
+                                 batch_size=tf.constant(current_batch_size, dtype=tf.int64), step=tf.constant(step, dtype=tf.int64))
+        
         WGAN_GP_train_g_step(generator, discriminator, alpha_tensor,
                              batch_size=tf.constant(current_batch_size, dtype=tf.int64), step=tf.constant(step, dtype=tf.int64))
         

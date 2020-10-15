@@ -69,7 +69,8 @@ unbias_data = unbias_list.map(preprocess_function).shuffle(100).batch(batch_size
 images1=iter(unbias_data).get_next().numpy()
 
 #Generator model
-gen_unweighted=g.generator("unweighted_model",dim)
+# gen_unweighted=g.generator("unweighted_model",dim)
+gen_unweighted=g.generator("\batch_test\16",dim)
 images2=gen_unweighted.generate(batch_size)
 
 # pre-process images
@@ -82,7 +83,8 @@ print('Unweighted FID: %.3f' % fid)
 
 
 #Generator model (Weighted)
-gen_weighted=g.generator("weighted_model",dim)
+# gen_weighted=g.generator("weighted_model",dim)
+gen_weighted=g.generator("\batch_test\32",dim)
 images2=gen_unweighted.generate(batch_size)
 images2 = preprocess_input(images2)
 
