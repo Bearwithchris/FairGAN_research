@@ -27,14 +27,14 @@ c.config_gpu()
 
 batch_size = 16
 CURRENT_EPOCH = 1 # Epoch start from 1. If resume training, set this to the previous model saving epoch.
-image_size = 256
+image_size = 32
 
 #Directories
 # DATA_BASE_DIR="../../scratch/alt"
 #DATA_BASE_DIR="D:/GIT/ResearchCode/proGAN/alt"
 TRAIN_LOGDIR = os.path.join("logs", "tensorflow", 'train_data') # Sets up a log directory.
-MODEL_PATH = 'models_boost'
-OUTPUT_PATH = 'Samples_boost'
+MODEL_PATH = 'models'
+OUTPUT_PATH = 'Samples'
 
 if not os.path.exists(OUTPUT_PATH):
     os.makedirs(OUTPUT_PATH)
