@@ -2,6 +2,7 @@
 """
 Created on Tue Nov 10 15:20:06 2020
 https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html
+https://towardsdatascience.com/dcgans-generating-dog-images-with-tensorflow-and-keras-fb51a1071432
 @author: Chris
 """
 
@@ -21,7 +22,7 @@ from IPython import display
 image_size = 64
 batch_size = 128
 NOISE_DIM = 100
-noiseratio=1
+# noiseratio=1
 
 # DATA_BASE_DIR="D:/GIT/local_data_in_use/dummy"
 DATA_BASE_DIR="D:/GIT/local_data_in_use/bias_point9"
@@ -33,10 +34,21 @@ train_data = list_ds.map(preprocess_function).shuffle(100).batch(batch_size)  #A
 generator_optimizer = tf.keras.optimizers.Adam(0.0002,beta_1=0.5 )
 discriminator_optimizer = tf.keras.optimizers.Adam(0.0002,beta_1=0.5 )
 
+#######Experimental Function######################################
+def smooth_positive_labels(y):
+    return y - 0.3 + (np.random.random(y.shape) * 0.5)
+
+def smooth_negative_labels(y):
+    return y + np.random.random(y.shape) * 0.3
+
+##################################################################
+
 def discriminator_loss(real_output, fake_output):
     cross_entropy=tf.keras.losses.BinaryCrossentropy(from_logits=True)
     real_loss = cross_entropy(tf.ones_like(real_output), real_output)
     fake_loss = cross_entropy(tf.zeros_like(fake_output), fake_output)
+    # real_loss = cross_entropy(smooth_positive_labels(tf.ones_like(real_output)), real_output) #Experiment
+    # fake_loss = cross_entropy(smooth_negative_labels(tf.zeros_like(fake_output)), fake_output) #Experiment
     total_loss = real_loss + fake_loss
     return total_loss
 
@@ -46,11 +58,7 @@ def generator_loss(fake_output):
    
 @tf.function
 def train_step(generator, discriminator, real_image, batch_size):
-    '''
-        One training step
-        
-        Reference: https://www.tensorflow.org/tutorials/generative/dcgan
-    '''
+
     # noise = tf.random.normal([batch_size, noiseratio,noiseratio,NOISE_DIM])
     noise = tf.random.uniform([batch_size,NOISE_DIM])
     ###################################
