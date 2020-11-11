@@ -60,7 +60,7 @@ def make_discriminator_model():
     
     #1
     x=tf.keras.layers.Conv2D(ndf*1,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer=weight_initializer)(inputs)
-    x=tf.keras.layers.BatchNormalization()(x)
+    # x=tf.keras.layers.BatchNormalization()(x)
     x=tf.keras.layers.LeakyReLU(alpha=0.2)(x)
     x=tf.keras.layers.Dropout(0.5)(x) #Test
     
