@@ -16,11 +16,10 @@ import time
 import tensorflow as tf
 import data
 from functools import partial
-import model
-
+import model_exp as model
 from IPython import display
 image_size = 64
-batch_size = 128
+batch_size = 1
 NOISE_DIM = 100
 noiseratio=1
 
@@ -45,7 +44,7 @@ def generator_loss(fake_output):
     cross_entropy=tf.keras.losses.BinaryCrossentropy(from_logits=True)
     return cross_entropy(tf.ones_like(fake_output), fake_output)
    
-@tf.function
+# @tf.function
 def train_step(generator, discriminator, real_image, batch_size):
     '''
         One training step
@@ -53,7 +52,7 @@ def train_step(generator, discriminator, real_image, batch_size):
         Reference: https://www.tensorflow.org/tutorials/generative/dcgan
     '''
     # noise = tf.random.normal([batch_size, noiseratio,noiseratio,NOISE_DIM])
-    noise = tf.random.normal([batch_size,noiseratio,noiseratio,NOISE_DIM])
+    noise = tf.random.normal([batch_size,NOISE_DIM])
     ###################################
     # Train D
     ###################################
@@ -95,7 +94,7 @@ def train(dataset, epochs):
       current_batch_size = image.shape[0]
       train_step(generator,discriminator,image,batch_size=tf.constant(current_batch_size, dtype=tf.int64))
       if step%100==0:
-          generate_and_save_images(generator,epoch,tf.random.normal([16,noiseratio,noiseratio,NOISE_DIM]))
+          generate_and_save_images(generator,epoch,tf.random.normal([16,NOISE_DIM]))
 
     # Save the model every 15 epochs
     if (epoch + 1) % 15 == 0:

@@ -50,12 +50,16 @@ import tensorflow as tf
 
 def make_generator_model():
     ngf=64
-    inputs = tf.keras.layers.Input([1,1,100])
+    inputs = tf.keras.layers.Input(100)
     
-    #1
-    x=tf.keras.layers.Conv2DTranspose(ngf*8,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer='glorot_normal')(inputs)
+    x=tf.keras.layers.Dense(4*4* ngf*8, use_bias=False)(inputs)
     x=tf.keras.layers.BatchNormalization()(x)
     x=tf.keras.layers.ReLU()(x)
+    x=tf.keras.layers.Reshape((4, 4, ngf*8))(x)
+    # #1
+    # x=tf.keras.layers.Conv2DTranspose(ngf*8,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer='glorot_normal')(inputs)
+    # x=tf.keras.layers.BatchNormalization()(x)
+    # x=tf.keras.layers.ReLU()(x)
     
     #2
     x=tf.keras.layers.Conv2DTranspose(ngf*4,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer='glorot_normal')(x)
@@ -72,10 +76,10 @@ def make_generator_model():
     x=tf.keras.layers.BatchNormalization()(x)
     x=tf.keras.layers.ReLU()(x)
 
-    #5
-    x=tf.keras.layers.Conv2DTranspose(ngf*1,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer='glorot_normal')(x)
-    x=tf.keras.layers.BatchNormalization()(x)
-    x=tf.keras.layers.ReLU()(x)
+    # #5
+    # x=tf.keras.layers.Conv2DTranspose(ngf*1,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer='glorot_normal')(x)
+    # x=tf.keras.layers.BatchNormalization()(x)
+    # x=tf.keras.layers.ReLU()(x)
     
     #6
     x=tf.keras.layers.Conv2DTranspose(3,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer='glorot_normal')(x)
@@ -83,6 +87,8 @@ def make_generator_model():
     model=tf.keras.Model(inputs=inputs, outputs=out)
     model.summary()
     return model
+
+# make_generator_model()
 
 def make_discriminator_model():
     ndf=64
@@ -106,20 +112,27 @@ def make_discriminator_model():
     #4
     x=tf.keras.layers.Conv2D(ndf*8,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer='glorot_normal')(x)
     x=tf.keras.layers.BatchNormalization()(x)
-    x=tf.keras.layers.LeakyReLU()(x)
+    x=tf.keras.layers.LeakyReLU(alpha=0.2)(x)
 
-    # #5
-    x=tf.keras.layers.Conv2D(ndf*1,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer='glorot_normal')(x)
-    x=tf.keras.layers.BatchNormalization()(x)
-    x=tf.keras.layers.LeakyReLU()(x)
+    # # #5
+    # x=tf.keras.layers.Conv2D(ndf*1,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer='glorot_normal')(x)
+    # x=tf.keras.layers.BatchNormalization()(x)
+    # x=tf.keras.layers.LeakyReLU(alpha=0.2)(x)
+    
+
     
     #6
-    out=tf.keras.layers.Conv2D(1,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer='glorot_normal')(x)
+    # out=tf.keras.layers.Conv2D(1,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer='glorot_normal')(x)
+    
+    out=tf.keras.layers.Flatten()(x)
+    out=tf.keras.layers.Dense(1)(out)
     out=tf.keras.activations.sigmoid(out)
+    
     model=tf.keras.Model(inputs=inputs, outputs=out)
     model.summary()
     return model
 
+# make_discriminator_model()
 # generator=make_generator_model()
 # noise = tf.random.normal([1,1,1,100])
 # generated_image = generator(noise, training=False)
