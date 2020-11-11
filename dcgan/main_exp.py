@@ -19,7 +19,7 @@ from functools import partial
 import model_exp as model
 from IPython import display
 image_size = 64
-batch_size = 1
+batch_size = 128
 NOISE_DIM = 100
 noiseratio=1
 
