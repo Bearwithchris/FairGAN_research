@@ -44,7 +44,7 @@ def generator_loss(fake_output):
     cross_entropy=tf.keras.losses.BinaryCrossentropy(from_logits=True)
     return cross_entropy(tf.ones_like(fake_output), fake_output)
    
-# @tf.function
+@tf.function
 def train_step(generator, discriminator, real_image, batch_size):
     '''
         One training step
