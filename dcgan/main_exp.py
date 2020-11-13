@@ -24,24 +24,30 @@ batch_size = 128
 NOISE_DIM = 100
 # noiseratio=1
 
+
+#######Experimental Function######################################
+def smooth_positive_labels(y):
+    return y - 0.3 + (tf.random.uniform(y.shape) * 0.5)
+
+def smooth_negative_labels(y):
+    return y + tf.random.uniform(y.shape) * 0.3
+
+def flip(x: tf.Tensor) -> (tf.Tensor):
+    x = tf.image.random_flip_left_right(x)
+    return x
+##################################################################
+
 # DATA_BASE_DIR="D:/GIT/local_data_in_use/dummy"
 DATA_BASE_DIR="D:/GIT/local_data_in_use/bias_point9"
 list_ds = tf.data.Dataset.list_files(DATA_BASE_DIR + '/*')    
 preprocess_function = partial(data.preprocess_image, target_size=image_size)  #Partially fill in a function data.preprocess_image with the arguement image_size
-train_data = list_ds.map(preprocess_function).shuffle(100).batch(batch_size)  #Apply the function pre_process to list_ds
+# train_data = list_ds.map(preprocess_function).shuffle(100).batch(batch_size)  #Apply the function pre_process to list_ds
+train_data = list_ds.map(preprocess_function).map(flip).shuffle(100).batch(batch_size)  #Experimental (Data Augmentation)
 
 
 generator_optimizer = tf.keras.optimizers.Adam(0.0002,beta_1=0.5 )
 discriminator_optimizer = tf.keras.optimizers.Adam(0.0002,beta_1=0.5 )
 
-#######Experimental Function######################################
-def smooth_positive_labels(y):
-    return y - 0.3 + (np.random.random(y.shape) * 0.5)
-
-def smooth_negative_labels(y):
-    return y + np.random.random(y.shape) * 0.3
-
-##################################################################
 
 def discriminator_loss(real_output, fake_output):
     cross_entropy=tf.keras.losses.BinaryCrossentropy(from_logits=True)
@@ -60,7 +66,8 @@ def generator_loss(fake_output):
 def train_step(generator, discriminator, real_image, batch_size):
 
     # noise = tf.random.normal([batch_size, noiseratio,noiseratio,NOISE_DIM])
-    noise = tf.random.uniform([batch_size,NOISE_DIM])
+    # noise = tf.random.uniform([batch_size,NOISE_DIM])
+    noise = tf.random.normal([batch_size,NOISE_DIM])
     ###################################
     # Train D
     ###################################
@@ -91,22 +98,30 @@ checkpoint = tf.train.Checkpoint(generator_optimizer=generator_optimizer,
                                  discriminator_optimizer=discriminator_optimizer,
                                  generator=generator,
                                  discriminator=discriminator)
-
+SAVE_EVERY_N_EPOCH=10
+MODEL_PATH = 'models'
+if not os.path.exists(MODEL_PATH):
+    os.makedirs(MODEL_PATH)
+    
 def train(dataset, epochs):
   for epoch in range(epochs):
     print (epoch)
     start = time.time()
 
     for step, (image) in enumerate(dataset):
-      print(step)
+      # print(step)
       current_batch_size = image.shape[0]
       train_step(generator,discriminator,image,batch_size=tf.constant(current_batch_size, dtype=tf.int64))
       if step%100==0:
-          generate_and_save_images(generator,epoch,tf.random.uniform([16,NOISE_DIM]))
-
-    # Save the model every 15 epochs
-    if (epoch + 1) % 15 == 0:
+          generate_and_save_images(generator,epoch,tf.random.normal([16,NOISE_DIM]))
+          
+    if (epoch) % SAVE_EVERY_N_EPOCH == 0:
       checkpoint.save(file_prefix = checkpoint_prefix)
+    # Save the model every 15 epochs
+    # if epoch % SAVE_EVERY_N_EPOCH == 0:
+    #     generator.save_weights(os.path.join(MODEL_PATH, '{}x{}_generator.h5'.format(image_size, image_size)))
+    #     discriminator.save_weights(os.path.join(MODEL_PATH, '{}x{}_discriminator.h5'.format(image_size, image_size)))
+    #     print ('Saving model for epoch {}'.format(epoch))
 
     print ('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
 
@@ -127,5 +142,5 @@ def generate_and_save_images(model, epoch, test_input):
   plt.savefig('image_at_epoch_{:04d}.png'.format(epoch))
   plt.show()
   
-EPOCHS=100
+EPOCHS=20
 train(train_data, EPOCHS)
