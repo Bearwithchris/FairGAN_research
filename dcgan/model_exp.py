@@ -95,7 +95,7 @@ def make_discriminator_model():
     
     out=tf.keras.layers.Flatten()(x)
     out=tf.keras.layers.Dense(1)(out)
-    out=tf.keras.activations.sigmoid(out)
+    # out=tf.keras.activations.sigmoid(out)
     
     model=tf.keras.Model(inputs=inputs, outputs=out)
     model.summary()
@@ -106,3 +106,160 @@ def make_discriminator_model():
 # noise = tf.random.normal([1,1,1,100])
 # generated_image = generator(noise, training=False)
 
+
+def make_generator_model_128():
+    ngf=64
+    inputs = tf.keras.layers.Input(100)
+    
+    # #1
+    # x=tf.keras.layers.Dense(4*4* ngf*8, use_bias=False)(inputs)
+    # x=tf.keras.layers.BatchNormalization()(x)
+    # x=tf.keras.layers.ReLU()(x)
+    # x=tf.keras.layers.Reshape((4, 4, ngf*8))(x)
+
+    # #2 (4x4 -> 8x8)
+    # x=tf.keras.layers.Conv2DTranspose(ngf*4,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer=weight_initializer)(x)
+    # x=tf.keras.layers.BatchNormalization()(x)
+    # x=tf.keras.layers.ReLU()(x)
+    
+    
+    # #3 (8x8 -> 16x16)
+    # x=tf.keras.layers.Conv2DTranspose(ngf*2,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer=weight_initializer)(x)
+    # x=tf.keras.layers.BatchNormalization()(x)
+    # x=tf.keras.layers.ReLU()(x)
+    
+    # #4 (16x16 -> 32x32)
+    # x=tf.keras.layers.Conv2DTranspose(ngf*1,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer=weight_initializer)(x)
+    # x=tf.keras.layers.BatchNormalization()(x)
+    # x=tf.keras.layers.ReLU()(x)
+
+    
+    # #6 (32x32->64x64)
+    # x=tf.keras.layers.Conv2DTranspose(ngf*2,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer=weight_initializer)(x)
+    # x=tf.keras.layers.BatchNormalization()(x)
+    # x=tf.keras.layers.ReLU()(x)
+    
+    # #7 (64x64->128x128)
+    # x=tf.keras.layers.Conv2DTranspose(3,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer=weight_initializer)(x)
+    # out=tf.keras.activations.tanh(x)
+    
+    #==================================================
+    #1
+    x=tf.keras.layers.Dense(4*4* ngf*8, use_bias=False)(inputs)
+    x=tf.keras.layers.BatchNormalization()(x)
+    x=tf.keras.layers.ReLU()(x)
+    x=tf.keras.layers.Reshape((4, 4, ngf*8))(x)
+
+    #2 (4x4 -> 8x8)
+    x=tf.keras.layers.Conv2DTranspose(ngf*8,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer=weight_initializer)(x)
+    x=tf.keras.layers.BatchNormalization()(x)
+    x=tf.keras.layers.ReLU()(x)
+    
+    
+    #3 (8x8 -> 16x16)
+    x=tf.keras.layers.Conv2DTranspose(ngf*8,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer=weight_initializer)(x)
+    x=tf.keras.layers.BatchNormalization()(x)
+    x=tf.keras.layers.ReLU()(x)
+    
+    #4 (16x16 -> 32x32)
+    x=tf.keras.layers.Conv2DTranspose(ngf*4,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer=weight_initializer)(x)
+    x=tf.keras.layers.BatchNormalization()(x)
+    x=tf.keras.layers.ReLU()(x)
+
+    
+    #6 (32x32->64x64)
+    x=tf.keras.layers.Conv2DTranspose(ngf*2,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer=weight_initializer)(x)
+    x=tf.keras.layers.BatchNormalization()(x)
+    x=tf.keras.layers.ReLU()(x)
+    
+    #7 (64x64->128x128)
+    x=tf.keras.layers.Conv2DTranspose(3,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer=weight_initializer)(x)
+    out=tf.keras.activations.tanh(x)
+    #==================================================
+    
+    model=tf.keras.Model(inputs=inputs, outputs=out)
+    model.summary()
+    return model
+
+# make_generator_model_128()
+
+def make_discriminator_model_128():
+    ndf=64
+    inputs = tf.keras.layers.Input([128,128,3])
+
+    # #1 (128->64)
+    # x=tf.keras.layers.Conv2D(ndf*1,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer=weight_initializer)(inputs)
+    # # x=tf.keras.layers.BatchNormalization()(x)
+    # x=tf.keras.layers.LeakyReLU(alpha=0.2)(x)
+    # x=tf.keras.layers.Dropout(0.3)(x) #Test
+    
+    # #2 (64->32)
+    # x=tf.keras.layers.Conv2D(ndf*2,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer=weight_initializer)(x)
+    # # x=tf.keras.layers.BatchNormalization()(x)
+    # x=tf.keras.layers.LeakyReLU(alpha=0.2)(x)
+    # x=tf.keras.layers.Dropout(0.3)(x) #Test
+    
+    # #3 (32->16)
+    # x=tf.keras.layers.Conv2D(ndf*2,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer=weight_initializer)(x)
+    # x=tf.keras.layers.BatchNormalization()(x)
+    # x=tf.keras.layers.LeakyReLU(alpha=0.2)(x)
+    # x=tf.keras.layers.Dropout(0.3)(x) #Test
+    
+    # #4 (16->8)
+    # x=tf.keras.layers.Conv2D(ndf*4,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer=weight_initializer)(x)
+    # x=tf.keras.layers.BatchNormalization()(x)
+    # x=tf.keras.layers.LeakyReLU(alpha=0.2)(x)
+    # x=tf.keras.layers.Dropout(0.3)(x) #Test
+    
+    # #5 (8->4)
+    # x=tf.keras.layers.Conv2D(ndf*8,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer=weight_initializer)(x)
+    # x=tf.keras.layers.BatchNormalization()(x)
+    # x=tf.keras.layers.LeakyReLU(alpha=0.2)(x)
+    # x=tf.keras.layers.Dropout(0.3)(x) #Test
+
+    
+    # #6
+    # out=tf.keras.layers.Flatten()(x)
+    # out=tf.keras.layers.Dense(1)(out)
+
+    #====================================
+    #1 (128->64)
+    x=tf.keras.layers.Conv2D(ndf*1,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer=weight_initializer)(inputs)
+    # x=tf.keras.layers.BatchNormalization()(x)
+    x=tf.keras.layers.LeakyReLU(alpha=0.2)(x)
+    x=tf.keras.layers.Dropout(0.3)(x) #Test
+    
+    #2 (64->32)
+    x=tf.keras.layers.Conv2D(ndf*2,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer=weight_initializer)(x)
+    # x=tf.keras.layers.BatchNormalization()(x)
+    x=tf.keras.layers.LeakyReLU(alpha=0.2)(x)
+    x=tf.keras.layers.Dropout(0.3)(x) #Test
+    
+    #3 (32->16)
+    x=tf.keras.layers.Conv2D(ndf*4,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer=weight_initializer)(x)
+    x=tf.keras.layers.BatchNormalization()(x)
+    x=tf.keras.layers.LeakyReLU(alpha=0.2)(x)
+    x=tf.keras.layers.Dropout(0.3)(x) #Test
+    
+    #4 (16->8)
+    x=tf.keras.layers.Conv2D(ndf*8,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer=weight_initializer)(x)
+    x=tf.keras.layers.BatchNormalization()(x)
+    x=tf.keras.layers.LeakyReLU(alpha=0.2)(x)
+    x=tf.keras.layers.Dropout(0.3)(x) #Test
+    
+    #5 (8->4)
+    x=tf.keras.layers.Conv2D(ndf*8,kernel_size=4,strides=2,padding='same',use_bias=False, kernel_initializer=weight_initializer)(x)
+    x=tf.keras.layers.BatchNormalization()(x)
+    x=tf.keras.layers.LeakyReLU(alpha=0.2)(x)
+    x=tf.keras.layers.Dropout(0.3)(x) #Test
+
+    
+    #6
+    out=tf.keras.layers.Flatten()(x)
+    out=tf.keras.layers.Dense(1)(out)
+    #====================================
+    model=tf.keras.Model(inputs=inputs, outputs=out)
+    model.summary()
+    return model
+
+# make_discriminator_model_128()

@@ -13,7 +13,7 @@ import os
 from resnet import resnet18
 import config
 
-dim=64
+dim=128
 
 config.config_gpu()
 

@@ -21,6 +21,7 @@ import model_exp as model
 from IPython import display
 
 import config as c
+import density_classifier as dc
 
 image_size = 128
 batch_size = 128
@@ -43,11 +44,17 @@ def flip(x: tf.Tensor) -> (tf.Tensor):
 
 # DATA_BASE_DIR="D:/GIT/local_data_in_use/dummy"
 # DATA_BASE_DIR="D:/GIT/local_data_in_use/bias_point9"
-DATA_BASE_DIR="D:/GIT/local_data_in_use/bias_point9"
+DATA_BASE_DIR="D:/GIT/local_data_in_use/dref"
+DATA_BASE_DIR_bias="D:/GIT/local_data_in_use/bias_point9"
+
+#Dref
 list_ds = tf.data.Dataset.list_files(DATA_BASE_DIR + '/*')    
 preprocess_function = partial(data.preprocess_image, target_size=image_size)  #Partially fill in a function data.preprocess_image with the arguement image_size
-# train_data = list_ds.map(preprocess_function).shuffle(100).batch(batch_size)  #Apply the function pre_process to list_ds
 train_data = list_ds.map(preprocess_function).map(flip).shuffle(100).batch(batch_size)  #Experimental (Data Augmentation)
+
+#Dbias
+list_ds_bias = tf.data.Dataset.list_files(DATA_BASE_DIR_bias + '/*')    
+train_data_bias = list_ds_bias.map(preprocess_function).map(flip).shuffle(100).batch(batch_size)  #Experimental (Data Augmentation)
 
 
 generator_optimizer = tf.keras.optimizers.Adam(0.0002,beta_1=0.5 )
@@ -68,8 +75,8 @@ def generator_loss(fake_output):
     cross_entropy=tf.keras.losses.BinaryCrossentropy(from_logits=True)
     return cross_entropy(tf.ones_like(fake_output), fake_output)
    
-# @tf.function
-def train_step(generator, discriminator, real_image, batch_size):
+@tf.function
+def train_step(generator, discriminator, real_image, batch_size, weighted=False):
 
     # noise = tf.random.normal([batch_size, noiseratio,noiseratio,NOISE_DIM])
     # noise = tf.random.uniform([batch_size,NOISE_DIM])
@@ -82,7 +89,19 @@ def train_step(generator, discriminator, real_image, batch_size):
         
         real_output = discriminator(real_image, training=True)
         fake_output = discriminator(fake_image, training=True)
-        
+
+        if weighted==True:
+            # fake_density_weight=density_c(fake_image)
+            # f_w0,f_w1=tf.split(fake_density_weight,num_or_size_splits=2,axis=1)
+            # fake_weight_v=tf.math.divide(f_w0,f_w1)
+            # fake_output=tf.multiply(fake_output,fake_weight_v)
+            
+            real_density_weight=density_c(real_image)
+            r_w0,r_w1=tf.split(real_density_weight,num_or_size_splits=2,axis=1)
+            real_density_weight=tf.math.divide(r_w0,r_w1)
+            real_output=tf.multiply(real_output,real_density_weight)
+
+            
         gen_loss = generator_loss(fake_output)
         disc_loss = discriminator_loss(real_output, fake_output)
         
@@ -95,10 +114,14 @@ def train_step(generator, discriminator, real_image, batch_size):
     discriminator_optimizer.apply_gradients(zip(D_gradients,discriminator.trainable_variables))
 
 
+#Load Classifier
+density_c=dc.generate_model(image_size,dc.classifier_best(image_size))
+
+#Create GAN model
 discriminator = model.make_discriminator_model_128()
 generator = model.make_generator_model_128()
 
-checkpoint_dir = './training_checkpoints'
+checkpoint_dir = './training_checkpoints_weighted'
 checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
 checkpoint = tf.train.Checkpoint(generator_optimizer=generator_optimizer,
                                  discriminator_optimizer=discriminator_optimizer,
@@ -109,18 +132,26 @@ MODEL_PATH = 'models'
 if not os.path.exists(MODEL_PATH):
     os.makedirs(MODEL_PATH)
     
-def train(dataset, epochs):
+def train(dataset,dataset_bias, epochs):
   for epoch in range(epochs):
     print (epoch)
     start = time.time()
-
+          
+    #Train_D_bias
+    for step, (image) in enumerate(dataset_bias):
+      current_batch_size = image.shape[0]
+      train_step(generator,discriminator,image,batch_size=tf.constant(current_batch_size, dtype=tf.int64),weighted=True)
+      if step%100==0:
+          generate_and_save_images(generator,epoch,tf.random.normal([16,NOISE_DIM]))
+    
+    #Train D_ref
     for step, (image) in enumerate(dataset):
-      # print(step)
       current_batch_size = image.shape[0]
       train_step(generator,discriminator,image,batch_size=tf.constant(current_batch_size, dtype=tf.int64))
       if step%100==0:
           generate_and_save_images(generator,epoch,tf.random.normal([16,NOISE_DIM]))
           
+    
     if (epoch) % SAVE_EVERY_N_EPOCH == 0:
       checkpoint.save(file_prefix = checkpoint_prefix)
     # Save the model every 15 epochs
@@ -149,6 +180,6 @@ def generate_and_save_images(model, epoch, test_input):
   plt.show()
   
 EPOCHS=20
-train(train_data, EPOCHS)
+train(train_data,train_data_bias, EPOCHS)
 
 # generate_and_save_images(generator,20,tf.random.normal([batch_size,NOISE_DIM]))
