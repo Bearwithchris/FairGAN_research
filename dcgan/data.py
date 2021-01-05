@@ -27,7 +27,7 @@ def preprocess_image(file_path, target_size=512):
     # convert the compressed string to a 3D uint8 tensor
     images = tf.image.decode_jpeg(images, channels=3)
     images = tf.image.resize(images, (target_size, target_size),
-                           method='nearest', antialias=True)
+                           method='bilinear', antialias=True)#nearest
     images = augmentation(images)
     images = normalize(images)
     return images

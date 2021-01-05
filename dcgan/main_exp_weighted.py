@@ -24,8 +24,8 @@ import config as c
 import density_classifier as dc
 
 image_size = 128
-batch_size = 128
-NOISE_DIM = 100
+batch_size = 64
+NOISE_DIM = 128
 # noiseratio=1
 
 c.config_gpu()
@@ -58,7 +58,7 @@ train_data_bias = list_ds_bias.map(preprocess_function).map(flip).shuffle(100).b
 
 
 generator_optimizer = tf.keras.optimizers.Adam(0.0002,beta_1=0.5 )
-discriminator_optimizer = tf.keras.optimizers.Adam(0.0002,beta_1=0.5 )
+discriminator_optimizer = tf.keras.optimizers.Adam(0.0004,beta_1=0.5 )
 
 
 def discriminator_loss(real_output, fake_output):
@@ -84,6 +84,8 @@ def train_step(generator, discriminator, real_image, batch_size, weighted=False)
     ###################################
     # Train D
     ###################################
+    
+    # noise_disc=tf.random.normal(real_image.shape,mean=0.0,stddev=0.05)
     with tf.GradientTape() as g_tape,  tf.GradientTape(persistent=True) as d_tape:
         fake_image = generator(noise, training=True)
         
@@ -179,7 +181,7 @@ def generate_and_save_images(model, epoch, test_input):
   plt.savefig('image_at_epoch_{:04d}.png'.format(epoch))
   plt.show()
   
-EPOCHS=20
+EPOCHS=40
 train(train_data,train_data_bias, EPOCHS)
 
 # generate_and_save_images(generator,20,tf.random.normal([batch_size,NOISE_DIM]))

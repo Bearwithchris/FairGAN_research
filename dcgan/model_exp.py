@@ -109,7 +109,7 @@ def make_discriminator_model():
 
 def make_generator_model_128():
     ngf=64
-    inputs = tf.keras.layers.Input(100)
+    inputs = tf.keras.layers.Input(128)
     
     # #1
     # x=tf.keras.layers.Dense(4*4* ngf*8, use_bias=False)(inputs)
@@ -257,6 +257,8 @@ def make_discriminator_model_128():
     #6
     out=tf.keras.layers.Flatten()(x)
     out=tf.keras.layers.Dense(1)(out)
+    out=tf.keras.activations.sigmoid(out)
+    
     #====================================
     model=tf.keras.Model(inputs=inputs, outputs=out)
     model.summary()

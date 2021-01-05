@@ -23,9 +23,9 @@ from IPython import display
 import config as c
 
 image_size = 128
-batch_size = 128
-NOISE_DIM = 100
-# noiseratio=1
+batch_size = 64
+NOISE_DIM = 128
+
 
 c.config_gpu()
 
@@ -43,7 +43,7 @@ def flip(x: tf.Tensor) -> (tf.Tensor):
 
 # DATA_BASE_DIR="D:/GIT/local_data_in_use/dummy"
 # DATA_BASE_DIR="D:/GIT/local_data_in_use/bias_point9"
-DATA_BASE_DIR="D:/GIT/local_data_in_use/bias_point9"
+DATA_BASE_DIR="D:/GIT/local_data_in_use/unbias"
 list_ds = tf.data.Dataset.list_files(DATA_BASE_DIR + '/*')    
 preprocess_function = partial(data.preprocess_image, target_size=image_size)  #Partially fill in a function data.preprocess_image with the arguement image_size
 # train_data = list_ds.map(preprocess_function).shuffle(100).batch(batch_size)  #Apply the function pre_process to list_ds
@@ -51,11 +51,11 @@ train_data = list_ds.map(preprocess_function).map(flip).shuffle(100).batch(batch
 
 
 generator_optimizer = tf.keras.optimizers.Adam(0.0002,beta_1=0.5 )
-discriminator_optimizer = tf.keras.optimizers.Adam(0.0002,beta_1=0.5 )
+discriminator_optimizer = tf.keras.optimizers.Adam(0.0004,beta_1=0.5 )
 
 
 def discriminator_loss(real_output, fake_output):
-    cross_entropy=tf.keras.losses.BinaryCrossentropy(from_logits=True)
+    cross_entropy=tf.keras.losses.BinaryCrossentropy(from_logits=False) #Was True
     # real_loss = cross_entropy(tf.ones_like(real_output), real_output)
     real_loss = cross_entropy(tf.ones_like(real_output)*0.9, real_output) #Experiment One side smoothening 
     fake_loss = cross_entropy(tf.zeros_like(fake_output), fake_output)
@@ -65,10 +65,10 @@ def discriminator_loss(real_output, fake_output):
     return total_loss
 
 def generator_loss(fake_output):
-    cross_entropy=tf.keras.losses.BinaryCrossentropy(from_logits=True)
+    cross_entropy=tf.keras.losses.BinaryCrossentropy(from_logits=False) # Was True
     return cross_entropy(tf.ones_like(fake_output), fake_output)
    
-# @tf.function
+@tf.function
 def train_step(generator, discriminator, real_image, batch_size):
 
     # noise = tf.random.normal([batch_size, noiseratio,noiseratio,NOISE_DIM])
@@ -80,7 +80,7 @@ def train_step(generator, discriminator, real_image, batch_size):
     with tf.GradientTape() as g_tape,  tf.GradientTape(persistent=True) as d_tape:
         fake_image = generator(noise, training=True)
         
-        real_output = discriminator(real_image, training=True)
+        real_output = discriminator(real_image, training=True) 
         fake_output = discriminator(fake_image, training=True)
         
         gen_loss = generator_loss(fake_output)
@@ -148,7 +148,11 @@ def generate_and_save_images(model, epoch, test_input):
   plt.savefig('image_at_epoch_{:04d}.png'.format(epoch))
   plt.show()
   
-EPOCHS=20
+EPOCHS=100
 train(train_data, EPOCHS)
 
 # generate_and_save_images(generator,20,tf.random.normal([batch_size,NOISE_DIM]))
+# import matplotlib.pyplot as plt
+# for i in range(len(real_image)):
+#     plt.imshow(real_image[i])
+#     plt.show()
